@@ -30,4 +30,12 @@ export const tasks = [
     done: false,
     data: '2023-03-27 08:30',
   },
+
+  {
+    id: '5',
+    title: 'Entrega 1 Projeto',
+    description: 'Primeira Sessão do Roteiro',
+    done: false,
+    data: '2023-03-27 08:30',
+  },
 ];
