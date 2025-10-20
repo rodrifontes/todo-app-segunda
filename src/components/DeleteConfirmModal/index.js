@@ -1,11 +1,17 @@
 import CustomModal from "../CustomModal";
 
-import Button from "../Button";
 import { Text } from "../Text";
 
-export default function DeleteConfirmModal() {
+import Button from "../Button";
+
+import { Actions } from './styles';
+
+export default function DeleteConfirmModal({ visible, onClose, onConfirm }) {
   return (
-    <CustomModal>
+    <CustomModal
+      visible={visible}
+      onClose={onClose}
+    >
       <Text weight="600" size={18}>
         Tem certeza que deseja remover a tarefa?
       </Text>
@@ -14,7 +20,10 @@ export default function DeleteConfirmModal() {
         Tem certeza que deseja remover a tarefa?
       </Text>
 
-      <Button>Confirmar</Button>
+      <Actions>
+        <Button primary={false} onPress={onClose}>Cancelar</Button>
+        <Button onPress={onConfirm}>Confirmar</Button>
+      </Actions>
     </CustomModal>
   );
 }
