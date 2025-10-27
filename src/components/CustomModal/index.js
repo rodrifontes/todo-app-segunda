@@ -9,8 +9,10 @@ export default function CustomModal({ children, visible, onClose }) {
       statusBarTranslucent
       visible={visible}
       onRequestClose={onClose}
+      transparent
+      animationType='fade'
     >
-      <Overlay>
+      <Overlay behavior='padding'>
         <ModalBody>
           {children}
         </ModalBody>
