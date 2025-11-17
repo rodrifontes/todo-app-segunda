@@ -16,7 +16,7 @@ import EditTaskModal from '../components/EditTaskModal';
 
 import taskEmpty from '../assets/images/task.png';
 
-import { useTasksDatabase } from '../database/useTasksDatabase';
+import { api } from '../utils/api';
 
 export default function Main() {
   const [tasks, setTasks] = useState([]);
@@ -25,33 +25,27 @@ export default function Main() {
   const [isEditTaskModalVisible, setIsEditTaskModalVisible] = useState(false);
   const [taskIdBeingDelete, setTaskIdBeingDelete] = useState();
   const [taskBeingEdit, setTaskBeingEdit] = useState();
-  const [isLoading, setIsLoading] = useState(false);
-
-  const database = useTasksDatabase();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    getTasks();
-  }, []);
-
-  async function getTasks() {
-    setIsLoading(true);
-    try {
-      setTasks(await database.show());
-    } catch (error) {
-      console.log(error);
-    } finally {
+    api.get('/tasks').then((response) => {
+      setTasks(response.data);
       setIsLoading(false);
-    }
-  }
+    }).catch((error) => {
+      console.log(error);
+    });
+  }, []);
 
   function handleDeleteTask(id) {
     setTaskIdBeingDelete(id);
     setIsDeleteConfirmModalVIsible(true);
   }
 
-  function handleConfirmDeleteTask() {
-    database.remove(taskIdBeingDelete);
-    getTasks();
+  async function handleConfirmDeleteTask() {
+    await api.delete(`/tasks/${taskIdBeingDelete}`);
+    setTasks((prevState) => prevState.filter(
+      (task) => task.id !== taskIdBeingDelete
+    ));
     setIsDeleteConfirmModalVIsible(false);
   }
 
@@ -60,20 +54,24 @@ export default function Main() {
     setIsEditTaskModalVisible(true);
   }
 
-  function handleChangeStatus(id) {
-    database.updateStatus(id);
-    getTasks();
+  async function handleChangeStatus(id) {
+    const { data: taskUpdate } = await api.patch(`/tasks/status/${id}`);
+    setTasks((prevState) => prevState.map(
+      (taskItem) => taskItem.id === id ? taskUpdate : taskItem
+    ));
   }
 
-  function handleCreateTask(task) {
-    database.create(task);
-    getTasks();
+  async function handleCreateTask(task) {
+    const { data: taskAdd } = await api.post('/tasks', task);
+    setTasks((prevState) => [taskAdd, ...prevState]);
     setIsNewTaskModalVisible(false);
   }
 
-  function handleUpdateTask(task) {
-    database.update(task);
-    getTasks();
+  async function handleUpdateTask(task) {
+    const { data: taskUpdate } = await api.put(`/tasks/${task.id}`, task);
+    setTasks((prevState) => prevState.map(
+      (taskItem) => taskItem.id === task.id ? taskUpdate : taskItem
+    ));
     setIsEditTaskModalVisible(false);
   }
 
